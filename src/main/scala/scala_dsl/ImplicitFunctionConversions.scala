@@ -1,15 +1,15 @@
 package scala_dsl
 
-import org.reactive_ros.streams.messages.Topic
-import org.reactive_ros.util.functions._
 import java.lang.{Boolean => JBool}
+
+import org.reactive_ros.util.functions._
 
 /**
  * @author Orestis Melkonian
  */
 package object ImplicitFunctionConversions {
   // TOPICS
-  implicit def topics(topic: Topic): List[Topic] = List(topic)
+//  implicit def topics(topic: Topic): List[Topic] = List(topic)
 
   // ACTIONS
   implicit def action0(f: (() => Unit)): Action0 =
