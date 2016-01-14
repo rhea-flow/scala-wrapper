@@ -2,7 +2,7 @@ package scala_dsl
 
 import java.util.PriorityQueue
 import org.reactive_ros.streams.Stream
-import scala_dsl.ImplicitFunctionConversions._
+import scala_dsl.ImplicitConversions._
 
 class HammingNumbers extends StreamNode {
   override val name: String = "hamming_numbers"
@@ -15,7 +15,7 @@ class HammingNumbers extends StreamNode {
           .startWith(1)
           .distinct
           .take(20)
-          .subscribe((t: Int) => println(t))
+          .subscribe((i: Int) => println(i))
   }
 
   // Pimping library using "implicit conversions"  

@@ -1,15 +1,67 @@
 package scala_dsl
 
-import java.lang.{Boolean => JBool}
+import java.util.PriorityQueue
 
+import org.reactive_ros.streams.Stream
+import org.reactive_ros.streams.messages.Topic
 import org.reactive_ros.util.functions._
 
 /**
  * @author Orestis Melkonian
  */
-package object ImplicitFunctionConversions {
-  // TOPICS
-//  implicit def topics(topic: Topic): List[Topic] = List(topic)
+package object ImplicitConversions {
+  /* New stream operators */
+  class RichStream(stream: Stream[Int]) {
+    def nat(): Stream[Int] =
+      stream.loop((entry: Stream[Int]) => entry.inc())
+
+    /*def even(): Stream[Int] =
+      stream.filter((i: Int) => i % 2 == 0)*/
+
+    def inc(): Stream[Int] =
+      stream.map((i: Int) => i + 1)
+
+    def multiply(constant: Int): Stream[Int] =
+      stream.map((i: Int) => i * constant)
+
+    def mergeSort(other: Stream[Int]): Stream[Int] = {
+      val queue: java.util.Queue[Int] = new PriorityQueue[Int]()
+      Stream.zip(stream, other, (i1: Int, i2: Int) => {
+        val min: Int = Math.min(i1, i2)
+        val max: Int = Math.max(i1, i2)
+        queue.add(max)
+        if (min < queue.peek())
+          min
+        else {
+          queue.add(min)
+          queue.poll()
+        }
+      }: Int)
+        .concatWith(Stream.from(queue))
+        .distinct
+    }
+  }
+
+  object RichStream {
+    def compose[T](node: StreamNode): Stream[T] = {
+      node.run()
+      Stream.fromInner(node.outputTopic)
+    }
+
+    def composeLegacy[T](node: StreamNode): Stream[T] = {
+      node.run()
+      Stream.from(node.outputTopic)
+    }
+  }
+
+  implicit def enrichStream(st: Stream[Int]): RichStream = new RichStream(st)
+
+  /* Topic infix constructor */
+  class RichString(string: String) {
+    def -(topicType: String): Topic = new Topic(string, topicType)
+    def ->(topic: Topic): Map[String, Topic] = Map((string, topic))
+  }
+  implicit def enrichString(st: String): RichString = new RichString(st)
 
   // ACTIONS
   implicit def action0(f: (() => Unit)): Action0 =
@@ -58,7 +110,7 @@ package object ImplicitFunctionConversions {
     new Func0[R] {
       def call(): R = f()
     }
-  implicit def function1[A, R](f: ((A) => R)): Func1[A, R] =
+  implicit def function1[A, R](f: (A) => R): Func1[A, R] =
     new Func1[A, R] {
       def call(a: A): R = f(a)
     }
@@ -93,47 +145,5 @@ package object ImplicitFunctionConversions {
   implicit def function9[A, B, C, D, E, G, H, I, J, R](f: ((A, B, C, D, E, G, H, I, J) => R)): Func9[A, B, C, D, E, G, H, I, J, R] =
     new Func9[A, B, C, D, E, G, H, I, J, R] {
       def call(a: A, b: B, c: C, d: D, e: E, g: G, h: H, i: I, j: J): R = f(a, b, c, d, e, g, h, i, j)
-    }
-
-  // BOOLEAN FUNCTIONS
-  implicit def bfunc0(f: ((() => Boolean))): Func0[JBool] =
-    new Func0[JBool] {
-      def call(): JBool = f().booleanValue()
-    }
-  implicit def bfunc1[A](f: ((A => Boolean))): Func1[A, JBool] =
-    new Func1[A, JBool] {
-      def call(a: A): JBool = f(a).booleanValue()
-    }
-  implicit def bfunc2[A, B](f: ((A, B) => Boolean)): Func2[A, B, JBool] =
-    new Func2[A, B, JBool] {
-      def call(a: A, b: B): JBool = f(a, b).booleanValue
-    }
-  implicit def bfunc3[A, B, C](f: ((A, B, C) => Boolean)): Func3[A, B, C, JBool] =
-    new Func3[A, B, C, JBool] {
-      def call(a: A, b: B, c: C): JBool = f(a, b, c).booleanValue()
-    }
-  implicit def bfunc4[A, B, C, D](f: ((A, B, C, D) => Boolean)): Func4[A, B, C, D, JBool] =
-    new Func4[A, B, C, D, JBool] {
-      def call(a: A, b: B, c: C, d: D): JBool = f(a, b, c, d).booleanValue()
-    }
-  implicit def bfunc5[A, B, C, D, E](f: ((A, B, C, D, E) => Boolean)): Func5[A, B, C, D, E, JBool] =
-    new Func5[A, B, C, D, E, JBool] {
-      def call(a: A, b: B, c: C, d: D, e: E): JBool = f(a, b, c, d, e).booleanValue()
-    }
-  implicit def bfunc6[A, B, C, D, E, G](f: ((A, B, C, D, E, G) => Boolean)): Func6[A, B, C, D, E, G, JBool] =
-    new Func6[A, B, C, D, E, G, JBool] {
-      def call(a: A, b: B, c: C, d: D, e: E, g: G): JBool = f(a, b, c, d, e, g).booleanValue()
-    }
-  implicit def bfunc7[A, B, C, D, E, G, H](f: ((A, B, C, D, E, G, H) => Boolean)): Func7[A, B, C, D, E, G, H, JBool] =
-    new Func7[A, B, C, D, E, G, H, JBool] {
-      def call(a: A, b: B, c: C, d: D, e: E, g: G, h: H): JBool = f(a, b, c, d, e, g, h).booleanValue()
-    }
-  implicit def bfunc8[A, B, C, D, E, G, H, I](f: ((A, B, C, D, E, G, H, I) => Boolean)): Func8[A, B, C, D, E, G, H, I, JBool] =
-    new Func8[A, B, C, D, E, G, H, I, JBool] {
-      def call(a: A, b: B, c: C, d: D, e: E, g: G, h: H, i: I): JBool = f(a, b, c, d, e, g, h, i).booleanValue()
-    }
-  implicit def bfunc9[A, B, C, D, E, G, H, I, J](f: ((A, B, C, D, E, G, H, I, J) => Boolean)): Func9[A, B, C, D, E, G, H, I, J, JBool] =
-    new Func9[A, B, C, D, E, G, H, I, J, JBool] {
-      def call(a: A, b: B, c: C, d: D, e: E, g: G, h: H, i: I, j: J): JBool = f(a, b, c, d, e, g, h, i, j).booleanValue()
     }
 }
