@@ -1,7 +1,9 @@
 package scala_dsl
 
+import org.reactive_ros.streams.Stream
 import org.reactive_ros.streams.messages.Topic
 import org.reactive_ros.util.functions._
+import sensor_msgs.LaserScan
 import scala_dsl.ImplicitConversions._
 
 /**
@@ -9,14 +11,14 @@ import scala_dsl.ImplicitConversions._
  */
 class AdHoc extends StreamNode {
   override val name: String = "scala_dsl"
-  override val inputTopics: Map[String, Topic] =
+  override val inputs: Map[String, Topic] =
     ("LASER" -> ("/scan"-"LaserScan")) ++
     ("CAMERA" -> ("/camera/rgb/image_color"-"Image")) ++
     ("DEPTH" -> ("/camera/depth/image"-"Image")) ++
     ("TF" -> ("/tf"-"TFMessage"))
 
   override def dataflow(): Unit = {
-
+    Stream.from[LaserScan]("LASER")
     // Test lambda conversions
     /*val a0: Action0 = () => print("default")
     val a1: Action1[Int] = (x: Int) => print(x)

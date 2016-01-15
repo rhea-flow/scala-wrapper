@@ -43,14 +43,9 @@ package object ImplicitConversions {
   }
 
   object RichStream {
-    def compose[T](node: StreamNode): Stream[T] = {
+    def compose[T](node: LegacyNode): Stream[T] = {
       node.run()
-      Stream.fromInner(node.outputTopic)
-    }
-
-    def composeLegacy[T](node: StreamNode): Stream[T] = {
-      node.run()
-      Stream.from(node.outputTopic)
+      Stream.from(node.outputs)
     }
   }
 
