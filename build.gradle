@@ -1,27 +1,76 @@
 apply plugin: 'scala'
 apply plugin: 'idea'
-apply plugin: 'application'
-mainClassName = 'org.ros.RosRun'
+apply plugin: 'maven'
 
-repositories {	
-	maven {
-		url "https://github.com/rosjava/rosjava_mvn_repo/raw/master/"
-	}
+repositories {
 	mavenCentral()
+	maven { url "https://jitpack.io" }
 }
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
-dependencies {
-	compile 'org.ros.rosjava_core:rosjava:0.2.1'
-	compile 'org.ros.rosjava_messages:sensor_msgs:1.11.7'
 
-	// Include reactive-ros as single jar
-	compile files('./reactive-ros-1.0.0.jar')
+group = "com.github.rhea-flow"
+version = 1.0
+
+dependencies {
+
+	// rhea-flow
+	compile 'com.github.rhea-flow:rhea-core:-SNAPSHOT'
+	compile 'com.github.rhea-flow:rx-eval:-SNAPSHOT'
 
 	// Scala
-  	compile 'org.scala-lang:scala-compiler:2.12.0-M3' 
-  	compile 'org.scala-lang:scala-library:2.12.0-M3'  	
+  	compile 'org.scala-lang:scala-compiler:2.12.0-M3'
+  	compile 'org.scala-lang:scala-library:2.12.0-M3'
+
+	testCompile 'junit:junit:4.11'
+	testCompile 'com.github.rhea-flow:test-data:-SNAPSHOT'
+}
+
+sourceSets {
+	main {
+		scala {
+			srcDirs = ['src/main/scala']
+		}
+	}
+	test {
+		scala {
+			srcDirs = ['src/test/scala']
+		}
+	}
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+	classifier = 'sources'
+	from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+	classifier = 'javadoc'
+	from javadoc.destinationDir
+}
+
+artifacts {
+	archives sourcesJar
+	archives javadocJar
+}
+
+test {
+	testLogging {
+		displayGranularity 3
+		//events 'passed', 'failed', 'standard_out'
+		//events 'passed', 'failed', 'standard_error'
+		events 'passed', 'failed', 'standard_out', 'standard_error'
+		exceptionFormat = 'full'
+	}
+}
+
+if (JavaVersion.current().isJava8Compatible()) {
+	allprojects {
+		tasks.withType(Javadoc) {
+			options.addStringOption('Xdoclint:none', '-quiet')
+		}
+	}
 }
 
 task wrapper(type: Wrapper) {

@@ -2,16 +2,15 @@ package scala_dsl
 
 import java.util.PriorityQueue
 
-import org.reactive_ros.streams.Stream
-import org.reactive_ros.streams.messages.Topic
-import org.reactive_ros.util.functions._
+import org.rhea_core.Stream
+import org.rhea_core.util.functions._
 
 /**
  * @author Orestis Melkonian
  */
 package object ImplicitConversions {
   /* New stream operators */
-  class RichStream(stream: Stream[Int]) {
+  class IntStream(stream: Stream[Int]) {
     def nat(): Stream[Int] =
       stream.loop((entry: Stream[Int]) => entry.inc())
 
@@ -42,21 +41,24 @@ package object ImplicitConversions {
     }
   }
 
-  object RichStream {
+
+  implicit def intifyStream(st: Stream[Int]): IntStream = new IntStream(st)
+  implicit def javaToScala_INT(i: Integer): Int = i.intValue
+  implicit def javaToScala_SINT(i: Stream[Integer]): Stream[Int] = i.map((in: Integer) => in.intValue)
+
+  /*object RichStream {
     def compose[T](node: LegacyNode): Stream[T] = {
       node.run()
       Stream.from(node.outputs)
     }
-  }
-
-  implicit def enrichStream(st: Stream[Int]): RichStream = new RichStream(st)
+  }*/
 
   /* Topic infix constructor */
-  class RichString(string: String) {
+  /*class RichString(string: String) {
     def -(topicType: String): Topic = new Topic(string, topicType)
     def ->(topic: Topic): Map[String, Topic] = Map((string, topic))
   }
-  implicit def enrichString(st: String): RichString = new RichString(st)
+  implicit def enrichString(st: String): RichString = new RichString(st)*/
 
   // ACTIONS
   implicit def action0(f: (() => Unit)): Action0 =
@@ -105,7 +107,7 @@ package object ImplicitConversions {
     new Func0[R] {
       def call(): R = f()
     }
-  implicit def function1[A, R](f: (A) => R): Func1[A, R] =
+  implicit def function1[A, R](f: A => R): Func1[A, R] =
     new Func1[A, R] {
       def call(a: A): R = f(a)
     }

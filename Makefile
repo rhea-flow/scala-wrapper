@@ -1,11 +1,16 @@
-all: $(shell find src -type f) *.jar
-	@./gradlew installDist
-run:
-	@./build/install/scala-dsl/bin/scala-dsl scala_dsl.Adhoc
-runHamming:
-	@./build/install/scala-dsl/bin/scala-dsl scala_dsl.HammingNumbers
+install: 
+	@./gradlew install
+update:
+	@./gradlew install --refresh-dependencies
+test:
+	@./gradlew test --tests Tester
+adhoc:
+	@./gradlew test --tests Adhoc
+hamming:
+	@./gradlew test --tests HammingNumbers
 idea: 
 	@./gradlew idea
+doc:
+	@./gradlew javadoc
 clean: 
-	@./gradlew clean 
-	
+	@./gradlew clean
