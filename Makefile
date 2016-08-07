@@ -3,7 +3,7 @@ install:
 update:
 	@./gradlew install --refresh-dependencies
 test:
-	@./gradlew test --tests Tester
+	@./gradlew test --tests Tester --stacktrace
 adhoc:
 	@./gradlew test --tests Adhoc
 hamming:

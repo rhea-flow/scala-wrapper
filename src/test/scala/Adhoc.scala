@@ -14,6 +14,10 @@ class Adhoc {
   def twelveTone() {
     Stream.evaluationStrategy = new RxjavaEvaluationStrategy
 
-    Stream.just(0, 1, 2).print()
+    Stream.zip[Int, Int, Int](
+      Stream.just(0, 1, 2),
+      Stream.just(-0, -1, -2),
+      (i1: Int, i2: Int) => i1 + i2 : Int
+    ).print()
   }
 }
