@@ -44,7 +44,8 @@ package object ImplicitConversions {
 
   implicit def intifyStream(st: Stream[Int]): IntStream = new IntStream(st)
   implicit def javaToScala_INT(i: Integer): Int = i.intValue
-  implicit def javaToScala_SINT(i: Stream[Integer]): Stream[Int] = i.map((in: Integer) => in.intValue)
+  implicit def javaToScala_SINT(i: Stream[Integer]): Stream[Int] =
+    i.asInstanceOf[Stream[Int]]
 
   /*object RichStream {
     def compose[T](node: LegacyNode): Stream[T] = {
