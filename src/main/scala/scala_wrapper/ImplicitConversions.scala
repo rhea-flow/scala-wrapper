@@ -1,4 +1,4 @@
-package scala_dsl
+package scala_wrapper
 
 import java.util.PriorityQueue
 

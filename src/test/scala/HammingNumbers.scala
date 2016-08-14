@@ -6,13 +6,13 @@ import rx_eval.RxjavaEvaluationStrategy
 import test_data.utilities.Threads
 
 import collection.JavaConverters._
-import scala_dsl.ImplicitConversions._
+import scala_wrapper.ImplicitConversions._
 
 /**
   * @author Orestis Melkonian
   */
 class HammingNumbers {
-  @Test
+//  @Test
   def hamming() {
     Stream.evaluationStrategy = new RxjavaEvaluationStrategy
 
