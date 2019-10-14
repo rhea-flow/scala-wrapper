@@ -26,18 +26,21 @@ package object ImplicitConversions {
     def mergeSort(other: Stream[Int]): Stream[Int] = {
       val queue: java.util.Queue[Int] = new PriorityQueue[Int]()
       Stream.zip(stream, other, (i1: Int, i2: Int) => {
-        val min: Int = Math.min(i1, i2)
-        val max: Int = Math.max(i1, i2)
-        queue.add(max)
-        if (min < queue.peek())
-          min
-        else {
-          queue.add(min)
-          queue.poll()
-        }
+        Math.min(i1, i2)
+        // val min: Int = Math.min(i1, i2)
+        // val max: Int = Math.max(i1, i2)
+        // println("adding")
+        // queue.add(max)
+        // if (min < queue.peek())
+        //   min
+        // else {
+        //   println("polling")
+        //   queue.add(min)
+        //   queue.poll()
+        // }
       }: Int)
-        .concatWith(Stream.from(queue))
-        .distinct
+        // .concatWith(Stream.from(queue))
+        // .distinct
     }
   }
 
